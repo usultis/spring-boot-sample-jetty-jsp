@@ -76,28 +76,6 @@ public class SampleJspApplication extends SpringBootServletInitializer {
                 }
             }
 
-            private Predicate<String> jspZipEntry() {
-                return new Predicate<String>() {
-                    @Override
-                    public boolean test(String zipEntry) {
-                        return jspEntryMatcher.matcher(zipEntry).matches();
-                    }
-                };
-            }
-
-            private Optional<String> jarFile() {
-                try {
-                    return Optional.of(new URL(substringBefore(this.getClass().getResource("").getPath(), "!")).getFile());
-                } catch (MalformedURLException e) {
-                    return Optional.empty();
-                }
-            }
-
-            private String substringBefore(String string, String delimiter) {
-                int delimiterIndex = string.indexOf(delimiter);
-                return delimiterIndex != -1 ? string.substring(0, delimiterIndex) : null;
-            }
-
         };
         jettyEmbeddedServletContainerFactory.addServerCustomizers(new JettyServerCustomizer() {
             @Override
@@ -110,10 +88,31 @@ public class SampleJspApplication extends SpringBootServletInitializer {
         return jettyEmbeddedServletContainerFactory;
     }
 
+    private Optional<String> jarFile() {
+        try {
+            return Optional.of(new URL(substringBefore(this.getClass().getResource("").getPath(), "!")).getFile());
+        } catch (MalformedURLException e) {
+            return Optional.empty();
+        }
+    }
+
     private void clearJspSystemUris() {
         Field systemUris = ReflectionUtils.findField(TldScanner.class, "systemUris");
         systemUris.setAccessible(true);
         ReflectionUtils.setField(systemUris, null, new HashSet<String>());
+    }
+    private Predicate<String> jspZipEntry() {
+        return new Predicate<String>() {
+            @Override
+            public boolean test(String zipEntry) {
+                return jspEntryMatcher.matcher(zipEntry).matches();
+            }
+        };
+    }
+
+    private String substringBefore(String string, String delimiter) {
+        int delimiterIndex = string.indexOf(delimiter);
+        return delimiterIndex != -1 ? string.substring(0, delimiterIndex) : null;
     }
 
 }

@@ -56,9 +56,7 @@ public class SampleJspApplication extends SpringBootServletInitializer {
 
     @Bean
     public JettyEmbeddedServletContainerFactory jettyEmbeddedServletContainerFactory() {
-        Field systemUris = ReflectionUtils.findField(TldScanner.class, "systemUris");
-        systemUris.setAccessible(true);
-        ReflectionUtils.setField(systemUris, null, new HashSet<String>());
+        clearJspSystemUris();
         JettyEmbeddedServletContainerFactory jettyEmbeddedServletContainerFactory = new JettyEmbeddedServletContainerFactory() {
             @Override
             protected void postProcessWebAppContext(WebAppContext webAppContext) {
@@ -110,6 +108,12 @@ public class SampleJspApplication extends SpringBootServletInitializer {
             }
         });
         return jettyEmbeddedServletContainerFactory;
+    }
+
+    private void clearJspSystemUris() {
+        Field systemUris = ReflectionUtils.findField(TldScanner.class, "systemUris");
+        systemUris.setAccessible(true);
+        ReflectionUtils.setField(systemUris, null, new HashSet<String>());
     }
 
 }
